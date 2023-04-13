@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.story.StoryFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvStory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_row_story"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddStory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_add_photo_24"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/emptyState"
+        layout="@layout/empty_state"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/errorState"
+        layout="@layout/empty_state"
+        android:visibility="gone"/>
+
+</FrameLayout>

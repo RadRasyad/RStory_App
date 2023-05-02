@@ -13,7 +13,6 @@
     <string name="error_username">Can\'t be less than 2 characters</string>
     <string name="empty_login">Please fill the text field</string>
     <string name="error_failed_login_title">Login failed</string>
-    <string name="error_failed_register_title">Register failed</string>
     <string name="empty_state_msg">Ops its empty here</string>
     <string name="illustration_image">Illustration Image</string>
     <string name="story">Story</string>
@@ -26,7 +25,14 @@
     <string name="description">Description</string>
     <string name="upload">Upload</string>
     <string name="ok">OK</string>
+    <string name="success">Success</string>
 
-    <string name="camera_failed_msg">Did not get permissions.</string>
+    <string name="choose_a_pic">Choose a Picture</string>
+    <string name="camera_failed_msg">Did not get permissions</string>
+    <string name="description_required">Description is required</string>
+    <string name="failed_upload_msg_null_img">Please insert an image file first</string>
+    <string name="failed_upload_data_msg">Failed to upload data</string>
+
+    <string name="theme_title">Theme</string>
 
 </resources>

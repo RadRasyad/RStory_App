@@ -9,20 +9,32 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.danrsy.rstoryapp.R
+import com.danrsy.rstoryapp.data.local.auth.UserPreference
 import com.danrsy.rstoryapp.databinding.ActivityAddStoryBinding
+import com.danrsy.rstoryapp.utils.Resource
 import com.danrsy.rstoryapp.utils.createCustomTempFile
 import com.danrsy.rstoryapp.utils.uriToFile
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 class AddStoryActivity : AppCompatActivity() {
 
-    private lateinit var binding : ActivityAddStoryBinding
+    private lateinit var binding: ActivityAddStoryBinding
+    private val addStoryViewModel: AddStoryViewModel by viewModels()
+    private lateinit var loginPreference: UserPreference
     private lateinit var currentPhotoPath: String
     private var photoFile: File? = null
 
@@ -31,6 +43,7 @@ class AddStoryActivity : AppCompatActivity() {
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        loginPreference = UserPreference(this)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -46,9 +59,71 @@ class AddStoryActivity : AppCompatActivity() {
         binding.apply {
             btnCamera.setOnClickListener { startTakePhoto() }
             btnGallery.setOnClickListener { startGallery() }
+            btnUpload.setOnClickListener { uploadPhoto() }
         }
     }
 
+    private fun uploadPhoto() {
+        if (photoFile != null) {
+            val authToken = loginPreference.getUser().token
+            val file = photoFile as File
+            val description =
+                binding.inpDesc.text.toString().trim()
+            val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
+                "photo",
+                file.name,
+                requestImageFile
+            )
+
+            if (description.isNotEmpty()) {
+                if (authToken != null) {
+                    addStoryViewModel.uploadStory(
+                        "Bearer $authToken",
+                        imageMultipart,
+                        description.toRequestBody("text/plain".toMediaType())
+                    )
+                        .observe(this@AddStoryActivity) {
+                            when (it) {
+                                is Resource.Loading -> showLoadingState(true)
+                                is Resource.Success -> {
+                                    showLoadingState(false)
+                                    Toast.makeText(
+                                        this@AddStoryActivity,
+                                        R.string.success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    finish()
+                                }
+                                is Resource.Error -> {
+                                    showLoadingState(false)
+                                    MaterialAlertDialogBuilder(this@AddStoryActivity)
+                                        .setTitle(resources.getString(R.string.failed_upload_data_msg))
+                                        .setMessage(it.data?.message)
+                                        .setPositiveButton(resources.getString(R.string.ok)) { dialog, _ ->
+                                            dialog.cancel()
+                                        }
+                                        .show()
+                                }
+                            }
+                        }
+                }
+            } else {
+                Toast.makeText(
+                    this@AddStoryActivity,
+                    R.string.description_required,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        } else {
+            Toast.makeText(
+                this@AddStoryActivity,
+                R.string.failed_upload_msg_null_img,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -68,7 +143,7 @@ class AddStoryActivity : AppCompatActivity() {
         if (it.resultCode == RESULT_OK) {
             val myFile = File(currentPhotoPath)
             photoFile = myFile
-            val result =  BitmapFactory.decodeFile(myFile.path)
+            val result = BitmapFactory.decodeFile(myFile.path)
 
             binding.ivPreview.setImageBitmap(result)
         }
@@ -94,7 +169,7 @@ class AddStoryActivity : AppCompatActivity() {
         val intent = Intent()
         intent.action = Intent.ACTION_GET_CONTENT
         intent.type = "image/*"
-        val chooser = Intent.createChooser(intent, "Choose a Picture")
+        val chooser = Intent.createChooser(intent, getString(R.string.choose_a_pic))
         launcherIntentGallery.launch(chooser)
     }
 
@@ -131,9 +206,11 @@ class AddStoryActivity : AppCompatActivity() {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    companion object {
-        const val CAMERA_X_RESULT = 200
+    private fun showLoadingState(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
 
+    companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
     }

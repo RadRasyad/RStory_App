@@ -1,12 +1,14 @@
 package com.danrsy.rstoryapp.ui.login
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
 import com.danrsy.rstoryapp.data.RStoryRepository
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = RStoryRepository()
+    private val repository = RStoryRepository(application)
 
-    suspend fun login(email: String, password: String) = repository.loginUser(email, password)
+    fun login(email: String, password: String) = repository.loginUser(email, password).asLiveData()
 
 }

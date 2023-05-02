@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">RStory App</string>
+
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="dont_have_an_account">tidak punya akun?</string>
+    <string name="already_have_an_acc">sudah punya akun?</string>
+    <string name="error_password">Kata sandi minimal 8 karakter</string>
+    <string name="error_email">Alamat email tidak valid</string>
+    <string name="error_username">Tidak boleh kurang dari 2 karakter</string>
+    <string name="empty_login">Harap isi kolom teks</string>
+    <string name="error_failed_login_title">Login gagal</string>
+    <string name="empty_state_msg">Ops kosong disini</string>
+    <string name="illustration_image">Gambar illustrasi</string>
+    <string name="story">Cerita</string>
+    <string name="setting">Pengaturan</string>
+    <string name="theme">Tema</string>
+    <string name="language">Bahasa</string>
+    <string name="logout">Logout</string>
+    <string name="camera">Kamera</string>
+    <string name="gallery">Galeri</string>
+    <string name="description">Deskripsi</string>
+    <string name="upload">Unggah</string>
+    <string name="ok">OK</string>
+    <string name="success">Berhasil</string>
+
+    <string name="choose_a_pic">Pilih Gambar</string>
+    <string name="camera_failed_msg">Tidak mendapatkan izin</string>
+    <string name="description_required">Deskripsi diperlukan</string>
+    <string name="failed_upload_msg_null_img">Harap masukkan file gambar terlebih dahulu</string>
+    <string name="failed_upload_data_msg">Gagal mengunggah data</string>
+
+    <string name="theme_title">Tema</string>
+</resources>

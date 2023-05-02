@@ -1,11 +1,13 @@
 package com.danrsy.rstoryapp.ui.story
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
 import com.danrsy.rstoryapp.data.RStoryRepository
 
-class StoryViewModel : ViewModel() {
+class StoryViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = RStoryRepository()
+    private val repository = RStoryRepository(application)
 
-    suspend fun getListStory(auth: String) = repository.getStories(auth)
+    fun getListStory(auth: String) = repository.getStories(auth).asLiveData()
 }

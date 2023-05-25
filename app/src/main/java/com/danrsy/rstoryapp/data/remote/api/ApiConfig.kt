@@ -1,4 +1,4 @@
-package com.danrsy.rstoryapp.data.remote
+package com.danrsy.rstoryapp.data.remote.api
 
 import com.danrsy.rstoryapp.BuildConfig
 import okhttp3.OkHttpClient

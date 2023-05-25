@@ -1,13 +1,14 @@
 package com.danrsy.rstoryapp.data
 
-import android.app.Application
-import com.danrsy.rstoryapp.data.local.theme.ThemeDataStore
-import com.danrsy.rstoryapp.data.model.login.LoginResponse
-import com.danrsy.rstoryapp.data.model.register.RegisterResponse
+import androidx.paging.*
+import com.danrsy.rstoryapp.data.local.room.database.StoryDatabase
+import com.danrsy.rstoryapp.data.local.room.entity.StoryEntity
 import com.danrsy.rstoryapp.data.model.story.DetailStoryResponse
 import com.danrsy.rstoryapp.data.model.story.ListStoryResponse
 import com.danrsy.rstoryapp.data.model.upload.UploadResponse
-import com.danrsy.rstoryapp.data.remote.ApiConfig
+import com.danrsy.rstoryapp.data.remote.StoryRemoteMediator
+import com.danrsy.rstoryapp.data.remote.api.ApiConfig
+import com.danrsy.rstoryapp.data.remote.api.ApiService
 import com.danrsy.rstoryapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,47 +18,31 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
 
-class RStoryRepository(application: Application) {
+@OptIn(ExperimentalPagingApi::class)
+class RStoryRepository(
+    private val storyDatabase: StoryDatabase,
+    private val apiService: ApiService,
+) {
 
-    private val dataStore: ThemeDataStore
+    fun getStories(auth: String): Flow<PagingData<StoryEntity>> {
 
-    init {
-        dataStore = ThemeDataStore.getInstance(application)
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            remoteMediator = StoryRemoteMediator(
+                storyDatabase,
+                apiService,
+                auth
+            ),
+            pagingSourceFactory = {
+                storyDatabase.storyDao().getStories()
+            }
+        ).flow
     }
 
-    fun registerUser(
-        name: String,
-        email: String,
-        password: String
-    ): Flow<Resource<RegisterResponse>> = flow {
+    fun getStoriesWithLocation(auth: String): Flow<Resource<ListStoryResponse>> = flow {
         try {
             emit(Resource.Loading())
-            val response = ApiConfig.getApiService().register(name, email, password)
-            emit(Resource.Success(response))
-        } catch (exception: Exception) {
-            val e = (exception as? HttpException)?.response()?.errorBody()?.string()
-            emit(Resource.Error(e))
-        }
-    }.flowOn(Dispatchers.IO)
-
-    fun loginUser(
-        email: String,
-        password: String
-    ): Flow<Resource<LoginResponse>> = flow {
-        try {
-            emit(Resource.Loading())
-            val response = ApiConfig.getApiService().login(email, password)
-            emit(Resource.Success(response))
-        } catch (exception: Exception) {
-            val e = (exception as? HttpException)?.response()?.errorBody()?.string()
-            emit(Resource.Error(e.toString()))
-        }
-    }.flowOn(Dispatchers.IO)
-
-    fun getStories(auth: String): Flow<Resource<ListStoryResponse>> = flow {
-        try {
-            emit(Resource.Loading())
-            val response = ApiConfig.getApiService().getStories(auth)
+            val response = ApiConfig.getApiService().getStories(auth = auth, location = 1)
             emit(Resource.Success(response))
         } catch (exception: Exception) {
             val e = (exception as? HttpException)?.response()?.errorBody()?.string()
@@ -91,7 +76,4 @@ class RStoryRepository(application: Application) {
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun saveThemeSetting(theme: Int) = dataStore.saveThemeSetting(theme)
-
-    fun getThemeSetting() = dataStore.getThemeSetting()
 }

@@ -12,12 +12,15 @@ import com.danrsy.rstoryapp.data.local.auth.UserPreference
 import com.danrsy.rstoryapp.data.model.story.StoryResponse
 import com.danrsy.rstoryapp.databinding.ActivityDetailStoryBinding
 import com.danrsy.rstoryapp.utils.Resource
+import com.danrsy.rstoryapp.utils.ViewModelFactory
 
 class DetailStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailStoryBinding
     private lateinit var loginPreference: UserPreference
-    private val detailViewModel: DetailViewModel by viewModels()
+    private val detailViewModel: DetailViewModel by viewModels {
+        ViewModelFactory(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

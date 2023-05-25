@@ -1,4 +1,4 @@
-package com.danrsy.rstoryapp.data.remote
+package com.danrsy.rstoryapp.data.remote.api
 
 import com.danrsy.rstoryapp.data.model.login.LoginResponse
 import com.danrsy.rstoryapp.data.model.register.RegisterResponse
@@ -28,8 +28,11 @@ interface ApiService {
 
     @GET("stories")
     suspend fun getStories(
-        @Header("Authorization") auth: String
-    ) : ListStoryResponse
+        @Header("Authorization") auth: String,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("location") location: Int? = null
+    ): ListStoryResponse
 
     @GET("stories/{id}")
     suspend fun getDetailStories(

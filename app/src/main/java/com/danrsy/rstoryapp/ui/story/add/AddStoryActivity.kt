@@ -20,7 +20,9 @@ import com.danrsy.rstoryapp.R
 import com.danrsy.rstoryapp.data.local.auth.UserPreference
 import com.danrsy.rstoryapp.databinding.ActivityAddStoryBinding
 import com.danrsy.rstoryapp.utils.Resource
+import com.danrsy.rstoryapp.utils.ViewModelFactory
 import com.danrsy.rstoryapp.utils.createCustomTempFile
+import com.danrsy.rstoryapp.utils.reduceFileImage
 import com.danrsy.rstoryapp.utils.uriToFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import okhttp3.MediaType.Companion.toMediaType
@@ -33,7 +35,9 @@ import java.io.File
 class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddStoryBinding
-    private val addStoryViewModel: AddStoryViewModel by viewModels()
+    private val addStoryViewModel: AddStoryViewModel by viewModels {
+        ViewModelFactory(this)
+    }
     private lateinit var loginPreference: UserPreference
     private lateinit var currentPhotoPath: String
     private var photoFile: File? = null
@@ -66,7 +70,7 @@ class AddStoryActivity : AppCompatActivity() {
     private fun uploadPhoto() {
         if (photoFile != null) {
             val authToken = loginPreference.getUser().token
-            val file = photoFile as File
+            val file = reduceFileImage(photoFile as File)
             val description =
                 binding.inpDesc.text.toString().trim()
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())

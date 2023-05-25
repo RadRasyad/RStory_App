@@ -1,13 +1,14 @@
 package com.danrsy.rstoryapp.ui.story
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.danrsy.rstoryapp.data.RStoryRepository
 
-class StoryViewModel(application: Application) : AndroidViewModel(application) {
+class StoryViewModel(repository: RStoryRepository): ViewModel() {
 
-    private val repository = RStoryRepository(application)
+    private val repo = repository
 
-    fun getListStory(auth: String) = repository.getStories(auth).asLiveData()
+    fun getStory(auth: String) = repo.getStories(auth).asLiveData().cachedIn(viewModelScope)
 }

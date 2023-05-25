@@ -34,5 +34,10 @@
     <string name="failed_upload_data_msg">Failed to upload data</string>
 
     <string name="theme_title">Theme</string>
+    <string name="retry">Retry</string>
+
+    <string name="permission_location_warning">Location not Allowed</string>
+    <string name="warning_active_location">Please active your location</string>
+    <string name="maps">Maps</string>
 
 </resources>

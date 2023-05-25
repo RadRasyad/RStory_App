@@ -34,4 +34,9 @@
     <string name="failed_upload_data_msg">Gagal mengunggah data</string>
 
     <string name="theme_title">Tema</string>
+    <string name="retry">Coba Lagi</string>
+
+    <string name="permission_location_warning">Lokasi tidak Diizinkan</string>
+    <string name="warning_active_location">Harap aktifkan lokasi Anda</string>
+    <string name="maps">Peta</string>
 </resources>

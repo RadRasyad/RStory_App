@@ -1,0 +1,10 @@
+RStoryRepository - Test
+1. Memastikan method getStories dapat dipanggil
+2. Memastikan data story tidak null
+3. Memastikan kesamaan data asli dengan data dummy
+
+StoryViewModel - Test
+1. Memastikan method getStories dapat dipanggil
+2. Memastikan data story tidak null
+3. Memastikan kesamaan data asli dengan data dummy
+3. Memastikan kesamaan data asli dengan data dummy dengan return kosong

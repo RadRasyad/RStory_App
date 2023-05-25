@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.danrsy.rstoryapp.data.local.auth.UserPreference
-import com.danrsy.rstoryapp.data.model.story.StoryResponse
 import com.danrsy.rstoryapp.databinding.FragmentStoryBinding
-import com.danrsy.rstoryapp.ui.adapter.StoryAdapter
+import com.danrsy.rstoryapp.ui.adapter.LoadingStateAdapter
+import com.danrsy.rstoryapp.ui.adapter.StoryListAdapter
 import com.danrsy.rstoryapp.ui.story.add.AddStoryActivity
-import com.danrsy.rstoryapp.utils.Resource
+import com.danrsy.rstoryapp.utils.ViewModelFactory
 
 
 class StoryFragment : Fragment() {
@@ -21,9 +21,10 @@ class StoryFragment : Fragment() {
     private var authToken: String? = null
     private var _binding: FragmentStoryBinding? = null
     private val binding get() = _binding
-    private val viewModel: StoryViewModel by viewModels()
+    private val viewModel: StoryViewModel by viewModels {
+        ViewModelFactory(requireActivity())
+    }
     private lateinit var loginPreference: UserPreference
-    private lateinit var adapter: StoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,8 +43,13 @@ class StoryFragment : Fragment() {
         binding?.fabAddStory?.setOnClickListener {
             startActivity(Intent(requireActivity(), AddStoryActivity::class.java))
         }
+        binding?.apply {
+            rvStory.layoutManager = LinearLayoutManager(requireActivity())
+        }
 
-        authToken?.let { getData(it) }
+        authToken?.let {
+            getData(it)
+        }
 
     }
 
@@ -53,61 +59,17 @@ class StoryFragment : Fragment() {
     }
 
     private fun getData(authToken: String) {
-        viewModel.getListStory("Bearer $authToken").observe(requireActivity()) {
-            when (it) {
-                is Resource.Loading -> {
-                    showLoadingState(true)
-                    showErrorMsg(false, "")
-                    showEmptyState(false)
-                }
 
-                is Resource.Success -> {
-                    showLoadingState(false)
-                    showErrorMsg(false, "")
-                    val data = it.data?.listStory
-                    if (data.isNullOrEmpty()) {
-                        showEmptyState(true)
-                    } else {
-                        populateData(data)
-                        showEmptyState(false)
-                    }
-                }
-
-                is Resource.Error -> {
-                    showLoadingState(false)
-                    showErrorMsg(true, it.message)
-                    showEmptyState(false)
-                }
+        val adapter = StoryListAdapter()
+        binding?.rvStory?.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter.retry()
             }
+        )
+        viewModel.getStory("Bearer $authToken").observe(requireActivity()) {
+            adapter.submitData(lifecycle, it)
         }
-    }
 
-    private fun populateData(data: List<StoryResponse>) {
-        adapter = StoryAdapter(data)
-        binding?.apply {
-            rvStory.layoutManager = LinearLayoutManager(requireContext())
-            rvStory.setHasFixedSize(true)
-            rvStory.adapter = adapter
-        }
-    }
-
-    private fun showLoadingState(isLoading: Boolean) {
-        binding?.progressBar?.visibility = if (isLoading) View.VISIBLE else View.GONE
-    }
-
-    private fun showEmptyState(state: Boolean) {
-        binding?.apply {
-            emptyState.root.visibility = if (state) View.VISIBLE else View.GONE
-            rvStory.visibility = if (state) View.GONE else View.VISIBLE
-        }
-    }
-
-    private fun showErrorMsg(state: Boolean, msg: String?) {
-        binding?.apply {
-            rvStory.visibility = if (state) View.GONE else View.VISIBLE
-            errorState.root.visibility = if (state) View.VISIBLE else View.GONE
-            emptyState.massage.text = msg
-        }
     }
 
     override fun onDestroyView() {

@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.danrsy.rstoryapp.data.RAuthRepository
-import com.danrsy.rstoryapp.data.RStoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
